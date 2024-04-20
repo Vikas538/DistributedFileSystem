@@ -71,7 +71,7 @@ func (t* TCPTransport) startAcceptLoop() {
 			conn,err:=t.listener.Accept()
 			print("TCP connection : %s\n",conn.RemoteAddr())
 			if err != nil {
-				println("Tcp error :%s\n",err)
+				println("Tcp read error :%s\n",err)
 				conn.Close()
 			}
 
@@ -96,9 +96,11 @@ func (t* TCPTransport) handleConnection(conn net.Conn){
 		}
 		rpc := RPC{}
 		for{
-				if err:= t.Decoder.Decode(conn,&rpc);err !=nil{
+				if err = t.Decoder.Decode(conn,&rpc);
+				
+				err !=nil {
 					fmt.Printf("TCP error :%s\n",err)
-					continue
+					return
 				}
 				rpc.From = conn.RemoteAddr()
 				t.rpcch <- rpc
