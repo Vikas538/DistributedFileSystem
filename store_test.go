@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -36,6 +37,7 @@ func TestStore(t *testing.T){
 	if string(b) != string(data){
 		t.Errorf("wants %s got &%s",data,b)
 	}
+	fmt.Println(string(b))
 
 	s.Delete(key)
 }
