@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/Vikas538/DistibutedFileSystem/p2p"
 )
@@ -13,24 +15,28 @@ func OnPeer(peer p2p.Peer)error{
 }
 
 func main(){
-	tcpOpts := p2p.TCPTransportOps{
+	tcptransportOPts := p2p.TCPTransportOps{
 		ListenAddr: ":3000",
-		HandshakeFunc: p2p.NOPHandshakeFunc,
 		Decoder: p2p.DefaultDecoder{},
-		OnPeer: OnPeer,
+		HandshakeFunc: p2p.NOPHandshakeFunc,
 	}
-	tr:= p2p.NewTcpTransport(tcpOpts)
-	go func ()  {
-		for {
-			rpc := <-tr.Consume()
-			fmt.Printf("%+v\n",rpc)
-		}
+	tcpTransport := p2p.NewTcpTransport(tcptransportOPts)
+	FileServerOpts:=FileServerOpts{
+		StorageRoot: "3000_network",
+		PathTransfromfunc: CASPathTransformFunc,
+		Transport: tcpTransport,
+	}
+	s := NewFileServer(FileServerOpts)
+	go func (){
+			time.Sleep(time.Second * 3)
+			s.Stop()
 	}()
-	if err:= tr.ListenAndAccept();err!=nil{
-		fmt.Println(err)
+	if err := s.start();err!=nil{
+		log.Fatal(err)
 	}
+
+
 	select{}
-	// fmt.Println("Read Gucci")
 }
 
 

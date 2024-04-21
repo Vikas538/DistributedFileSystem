@@ -21,7 +21,16 @@ type PathKey struct{
 	FileName string
 }
 
+func newStore() *Store{
+	opts := StoreOpts{
+		PathTransfromfunc : CASPathTransformFunc,
+	}
+	return NewStore(opts)
+}
 
+func (s *Store) Clear() error {
+	return os.RemoveAll(s.Root)
+}
 func NewStore(opts StoreOpts) * Store{
 	if opts.PathTransfromfunc == nil{
 		opts.PathTransfromfunc=DefaultPathTrasformFunc
@@ -108,6 +117,9 @@ type Store struct{
 	StoreOpts
 }
 
+func (s *Store) Write(key string,r io.Reader)error{
+	return s.writestream(key,r)
+}
 
 func (s *Store) writestream(key string,r io.Reader)error{
 	pathKey := s.PathTransfromfunc(key)

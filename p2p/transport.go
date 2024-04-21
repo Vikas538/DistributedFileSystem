@@ -7,6 +7,8 @@ type Peer interface{
 
 //interface wich handles the communication it can be TCP UDP or websockets
 type Transport interface{
-	listenAndAccept() error
+	Dial(string) error
+	ListenAndAccept() error
 	Consume() <- chan RPC
+	Close() error
 }
