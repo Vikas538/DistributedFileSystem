@@ -91,9 +91,8 @@ func (t* TCPTransport) startAcceptLoop() {
 			print("TCP connection : %s\n",conn.RemoteAddr())
 			if err != nil {
 				println("Tcp read error :%s\n",err)
-				conn.Close()
 			}
-
+			fmt.Printf("new incoiming connection %v\n",conn)
 			go t.handleConnection(conn,false)
 	}
 }

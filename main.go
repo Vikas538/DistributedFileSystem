@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
-
 	"github.com/Vikas538/DistibutedFileSystem/p2p"
 )
 
@@ -14,29 +12,29 @@ func OnPeer(peer p2p.Peer)error{
 	return nil
 }
 
-func main(){
-	tcptransportOPts := p2p.TCPTransportOps{
-		ListenAddr: ":3000",
-		Decoder: p2p.DefaultDecoder{},
+func makeServer(listenAddr string,nodes ...string) *FileServer{
+	tcpTransaportOps := p2p.TCPTransportOps{
+		ListenAddr: listenAddr,
 		HandshakeFunc: p2p.NOPHandshakeFunc,
+		Decoder: p2p.DefaultDecoder{},
 	}
-	tcpTransport := p2p.NewTcpTransport(tcptransportOPts)
-	FileServerOpts:=FileServerOpts{
-		StorageRoot: "3000_network",
+	tcpTransport := p2p.NewTcpTransport(tcpTransaportOps)
+	FileServerOpts := FileServerOpts{
+		StorageRoot: listenAddr + "_network",
 		PathTransfromfunc: CASPathTransformFunc,
 		Transport: tcpTransport,
-	}
-	s := NewFileServer(FileServerOpts)
-	go func (){
-			time.Sleep(time.Second * 3)
-			s.Stop()
+		BootstrapNodes: nodes,
+	} 
+	return NewFileServer(FileServerOpts)
+}
+
+func main(){
+	s1 := makeServer(":3000","")
+	s2 := makeServer(":4000",":3000")
+	go func() {
+		log.Fatal(s1.start())
 	}()
-	if err := s.start();err!=nil{
-		log.Fatal(err)
-	}
-
-
-	select{}
+	s2.start()
 }
 
 

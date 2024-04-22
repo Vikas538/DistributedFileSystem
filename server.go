@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/Vikas538/DistibutedFileSystem/p2p"
 )
@@ -40,16 +41,25 @@ func (s * FileServer) start()error{
 	if err :=s.Transport.ListenAndAccept() ; err!=nil{
 		return err
 	}
+
+		s.bootstrapNetwork()
+
 	s.loop()
 	return nil
 }
 
 func (s *FileServer) bootstrapNetwork() error{
+	go func(){
 	for _,addr := range s.BootstrapNodes{
-		if err :=	s.Transport.Dial(addr) ; err !=nil{
-			return err
+		if len(addr)==0 {
+			continue
 		}
-	}
+			if err :=	s.Transport.Dial(addr) ; err !=nil{
+				log.Println("dial err ",err)
+				continue
+			}
+		}
+		}()
 	return nil
 }
 
