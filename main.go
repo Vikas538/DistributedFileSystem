@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"time"
+
 	"github.com/Vikas538/DistibutedFileSystem/p2p"
 )
 
@@ -25,7 +28,11 @@ func makeServer(listenAddr string,nodes ...string) *FileServer{
 		Transport: tcpTransport,
 		BootstrapNodes: nodes,
 	} 
-	return NewFileServer(FileServerOpts)
+	s :=  NewFileServer(FileServerOpts)
+
+	tcpTransport.OnPeer =s.OnPeer
+
+	return s
 }
 
 func main(){
@@ -34,7 +41,12 @@ func main(){
 	go func() {
 		log.Fatal(s1.start())
 	}()
-	s2.start()
+	time.Sleep(1*time.Second)
+	go s2.start()
+	time.Sleep(1*time.Second)
+	data := bytes.NewReader([]byte("my big data file here!"))
+	s2.StoreData("myprivatekey",data)
+	select {}
 }
 
 
