@@ -35,7 +35,7 @@ func TestStore(t *testing.T){
 	for i:=0 ;i<50;i++{
 	key :=  fmt.Sprintf("Foo_%d",i)
 	data := []byte("some jpg bytes")
-	if err := s.writestream(key,bytes.NewReader(data));err!=nil{
+	if _,err := s.writestream(key,bytes.NewReader(data));err!=nil{
 		t.Error(err)
 	}
 	r,err :=s.Read(key);if(err!=nil){
@@ -64,7 +64,7 @@ func TestStoreDelete(t* testing.T){
 	s := NewStore(opts)
 	key := "momspecials"
 	data := []byte("some jpg bytes")
-	if err := s.writestream(key,bytes.NewReader(data));err!=nil{
+	if _,err := s.writestream(key,bytes.NewReader(data));err!=nil{
 		t.Error(err)
 	}
 	if err := s.Delete(key);err!=nil{
